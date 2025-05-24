@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import readController from "./controller/readController.js";
+import aggregationController from "./controller/aggregationController.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ const dbConnection = async () => {
 dbConnection();
 
 app.get("/read", readController);
+app.get("/aggregate", aggregationController);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
