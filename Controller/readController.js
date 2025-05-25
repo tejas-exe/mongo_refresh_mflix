@@ -2,7 +2,7 @@
 
 const commonProjection = { _id: 0, title: 1 };
 
-import { Movies } from "../models/models.js";
+import { Comments, Movies } from "../models/models.js";
 
 const readController = async (req, res) => {
   try {
@@ -115,6 +115,9 @@ const readController = async (req, res) => {
       message: "Data fetched successfully",
       data,
     });
+
+data = Comments.find({})
+
   } catch (error) {
     // ❌🔥 Handle Errors
     return res.status(500).json({

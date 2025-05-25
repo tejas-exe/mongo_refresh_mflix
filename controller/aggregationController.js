@@ -180,6 +180,147 @@ const aggregationController = async (req, res) => {
       { $count: "totalDocumentaryMovies" },
     ]);
 
+    // 🎬🍿 MFlix Mega Aggregation Challenge 🤓🔥
+    // 👨‍💻💾 Write an aggregation pipeline on the movies collection to:
+    // 🎯 Filter the Movies:
+    // 📅 Only movies released after 1990
+    // 💬 Must have at least one comment in the comments collection
+    // ⭐ IMDb rating >= 7
+    // 🧮 For each qualifying movie, calculate:
+    // 🎬 title, 🗓️ year, 🌟 imdb.rating
+    // 🧮 totalComments — number of comments per movie
+    // 🧑‍🎤 topCast — first 3 cast members 🎭🎭🎭
+    // 🧠 isClassic — true if:
+    // 🎞️ released before 2000 AND
+    // 💬 more than 50 comments
+    // 🧹 Sort & Limit:
+    // 🔽 Sort by totalComments DESC, then imdb.rating DESC
+    // ⛔ Limit to top 10 movies only
+    // 🧾 Output only these fields:
+    // 📽️ title
+    // 📆 year
+    // 📊 imdb.rating
+    // 👥 topCast
+    // 🧮 totalComments
+    // 🏛️ isClassic
+    // 💣🧠 This one’s a beast! Can you crack it? 😈💪
+    // A1
+    data = await Comments.aggregate([
+      {
+        $lookup: {
+          from: "movies",
+          localField: "movie_id",
+          foreignField: "_id",
+          as: "movie",
+        },
+      },
+      { $unwind: "$movie" },
+      {
+        $group: {
+          _id: "$movie.title",
+          totalComments: { $sum: 1 },
+          year: { $first: "$movie.year" },
+          imdbRating: { $first: "$movie.imdb.rating" },
+          topCast: { $first: { $slice: ["$movie.cast", 3] } },
+        },
+      },
+      {
+        $addFields: {
+          title: "$_id",
+          isClassic: {
+            $cond: {
+              if: {
+                $and: [
+                  { $lt: ["$year", 2000] },
+                  { $gt: ["$totalComments", 50] },
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          $and: [
+            { year: { $gt: 1990 } },
+            { imdbRating: { $gte: 7 } },
+            { totalComments: { $gt: 1 } },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+          totalComments: 1,
+          year: 1,
+          imdbRating: 1,
+          topCast: 1,
+          isClassic: 1,
+        },
+      },
+      { $sort: { totalComments: -1, imdbRating: -1 } },
+      { $limit: 10 },
+    ]);
+    // A2
+    data = await Movies.aggregate([
+      {
+        $match: {
+          year: { $gt: 1990 },
+          "imdb.rating": { $gte: 7 },
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "movie_id",
+          as: "movieComments",
+        },
+      },
+      {
+        $addFields: {
+          totalComments: { $size: "$movieComments" },
+        },
+      },
+      {
+        $match: {
+          totalComments: { $gt: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+          year: 1,
+          "imdb.rating": 1,
+          topCast: { $slice: ["$cast", 3] },
+          totalComments: 1,
+          isClassic: {
+            $cond: {
+              if: {
+                $and: [
+                  { $lt: ["$year", 2000] },
+                  { $gt: ["$totalComments", 50] },
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          totalComments: -1,
+          "imdb.rating": -1,
+        },
+      },
+      { $limit: 10 },
+    ]);
+
     // 🚀📤 Final Response
     return res.status(200).json({
       message: "Data fetched successfully",
