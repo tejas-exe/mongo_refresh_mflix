@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 // 🌐 Controllers
-import readController from "./controller/readController.js";
 import aggregationController from "./controller/aggregationController.js";
 import {
   manualTransaction,
@@ -13,6 +12,8 @@ import {
 } from "./controller/transactionController.js";
 import { simulateRaceConditionTxn } from "./controller/simulateRaceWithTxn.js";
 import { updateGames } from "./controller/updateController.js";
+import readController from "./Controller/readController.js";
+import { indexing } from "./controller/indexingController.js";
 
 // 📦 Load environment variables
 dotenv.config();
@@ -50,16 +51,17 @@ app.post(
 app.post("/placeOrder", placeOrder);
 app.post("/manualTransaction", manualTransaction);
 app.post("/simulate-race-txn", simulateRaceConditionTxn);
-
 // ---------------------------------------------------------------------------
 // 🔁  (Update)
 // ---------------------------------------------------------------------------
 app.patch("/update", updateGames);
 // ---------------------------------------------------------------------------
-// 📖 Read & Aggregation Endpoints
+// 📖 Read & Aggregation Endpoints & indexing
 // ---------------------------------------------------------------------------
 app.get("/read", readController);
 app.get("/aggregate", aggregationController);
+app.get("/indexingStat", indexing);
+
 
 // ---------------------------------------------------------------------------
 // 🚀 Start Server
