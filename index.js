@@ -12,6 +12,7 @@ import {
   restockInventoryWithTransaction,
 } from "./controller/transactionController.js";
 import { simulateRaceConditionTxn } from "./controller/simulateRaceWithTxn.js";
+import { updateGames } from "./controller/updateController.js";
 
 // 📦 Load environment variables
 dotenv.config();
@@ -39,7 +40,7 @@ const dbConnection = async () => {
 dbConnection();
 
 // ---------------------------------------------------------------------------
-// 🔁 Inventory Management Endpoints (Create/Update)
+// 🔁 Inventory Management Endpoints (Create/Transactions)
 // ---------------------------------------------------------------------------
 app.post("/restockInventoryWithTransaction", restockInventoryWithTransaction);
 app.post(
@@ -50,6 +51,10 @@ app.post("/placeOrder", placeOrder);
 app.post("/manualTransaction", manualTransaction);
 app.post("/simulate-race-txn", simulateRaceConditionTxn);
 
+// ---------------------------------------------------------------------------
+// 🔁  (Update)
+// ---------------------------------------------------------------------------
+app.patch("/update", updateGames);
 // ---------------------------------------------------------------------------
 // 📖 Read & Aggregation Endpoints
 // ---------------------------------------------------------------------------
